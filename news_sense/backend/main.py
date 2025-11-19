@@ -6,6 +6,9 @@ from categorize_news import categorize_headline
 from db import save_news_item, track_read_more_click, track_reddit_click, track_watch_time
 from gemini_summary import generate_summary
 from local_storage import save_interaction_locally
+from local_storage import store_user_interaction
+from fastapi import HTTPException
+from datetime import datetime
 
 
 
@@ -133,4 +136,25 @@ async def track_watch_time_endpoint(request: WatchTimeRequest):
         return {"status": "success", "message": "Watch time tracked"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error tracking watch time: {str(e)}")
+
+@app.post("/analytics/category")
+async def save_category_endpoint(request: AnalyticsRequest):
+    """
+    Receives: { "headline": "...", "category": "..." }
+    Stores the pair into local_user_data.json so later interactions have category available.
+    """
+    try:
+        # store minimal record with category (no increments)
+        store_user_interaction(
+            headline=request.headline,
+            category=request.category,
+            read_more_clicks=0,
+            reddit_clicks=0,
+            total_watch_time=0,
+            watch_sessions=0
+        )
+        return {"status": "success", "message": "Category stored locally"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error storing category locally: {e}")
+
 
