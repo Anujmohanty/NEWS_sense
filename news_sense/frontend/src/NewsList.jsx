@@ -51,7 +51,7 @@ export default function NewsList() {
         const endTime = Date.now();
         const watchTime = Math.round((endTime - startTime) / 1000); // in seconds
         if (watchTime > 0) {
-          trackWatchTime(headline, watchTime);
+          trackWatchTime(headline, watchTime, selectedArticle?.category);
         }
         delete watchTimeRefs.current[headline];
       };
