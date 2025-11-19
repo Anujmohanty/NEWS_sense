@@ -5,6 +5,9 @@ from redditSearch import get_reddit_links
 from categorize_news import categorize_headline
 from db import save_news_item, track_read_more_click, track_reddit_click, track_watch_time
 from gemini_summary import generate_summary
+from local_storage import save_interaction_locally
+
+
 
 app = FastAPI()
 
@@ -79,27 +82,55 @@ async def get_summary(request: SummaryRequest):
 
 @app.post("/analytics/read-more-click")
 async def track_read_more(request: AnalyticsRequest):
-    """Track a 'Read more' button click."""
     try:
+        # 1️⃣ Save to MongoDB (existing behavior)
         track_read_more_click(request.headline)
+
+        # 2️⃣ Save to local JSON (new behavior)
+        save_interaction_locally(
+            headline=request.headline,
+            category=request.category if hasattr(request, "category") else None,
+            read_more_increment=1
+        )
+
         return {"status": "success", "message": "Read more click tracked"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error tracking click: {str(e)}")
 
+
 @app.post("/analytics/reddit-click")
 async def track_reddit(request: AnalyticsRequest):
-    """Track a 'Discuss on Reddit' button click."""
     try:
+        # 1️⃣ Existing behavior — save to MongoDB
         track_reddit_click(request.headline)
+
+        # 2️⃣ New behavior — save locally
+        save_interaction_locally(
+            headline=request.headline,
+            category=request.category if hasattr(request, "category") else None,
+            reddit_increment=1
+        )
+
         return {"status": "success", "message": "Reddit click tracked"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error tracking click: {str(e)}")
 
+
 @app.post("/analytics/watch-time")
 async def track_watch_time_endpoint(request: WatchTimeRequest):
-    """Track watch time for a news item."""
     try:
+        # 1️⃣ Existing behavior — save to MongoDB
         track_watch_time(request.headline, request.watch_time)
+
+        # 2️⃣ New behavior — save locally
+        save_interaction_locally(
+            headline=request.headline,
+            category=request.category if hasattr(request, "category") else None,
+            watch_time_increment=request.watch_time,
+            sessions_increment=1
+        )
+
         return {"status": "success", "message": "Watch time tracked"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error tracking watch time: {str(e)}")
+
