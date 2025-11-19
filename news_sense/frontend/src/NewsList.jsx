@@ -62,6 +62,7 @@ export default function NewsList() {
     try {
       await axios.post("http://127.0.0.1:8000/analytics/watch-time", {
         headline,
+        category: selectedArticle.category,
         watch_time: watchTime,
       });
     } catch (err) {
@@ -69,10 +70,11 @@ export default function NewsList() {
     }
   };
 
-  const trackRedditClick = async (headline) => {
+  const trackRedditClick = async (article) => {
     try {
       await axios.post("http://127.0.0.1:8000/analytics/reddit-click", {
         headline,
+        category: article.category, 
       });
     } catch (err) {
       console.error("Error tracking reddit click:", err);
@@ -89,6 +91,7 @@ export default function NewsList() {
     try {
       await axios.post("http://127.0.0.1:8000/analytics/read-more-click", {
         headline: article.headline,
+        category: article.category, 
       });
     } catch (err) {
       console.error("Error tracking read more click:", err);
@@ -110,7 +113,7 @@ export default function NewsList() {
   };
 
   const handleRedditClick = (article) => {
-    trackRedditClick(article.headline);
+    trackRedditClick(article);
     window.open(article.reddit_link, "_blank");
   };
 
