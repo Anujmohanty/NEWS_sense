@@ -58,17 +58,19 @@ export default function NewsList() {
     }
   }, [isDialogOpen, selectedArticle]);
 
-  const trackWatchTime = async (headline, watchTime) => {
-    try {
-      await axios.post("http://127.0.0.1:8000/analytics/watch-time", {
-        headline:article.headline,
-        category: selectedArticle.category,
-        watch_time: watchTime,
-      });
-    } catch (err) {
-      console.error("Error tracking watch time:", err);
-    }
-  };
+  // replace existing trackWatchTime function with this
+const trackWatchTime = async (headline, watchTime, category) => {
+  try {
+    await axios.post("http://127.0.0.1:8000/analytics/watch-time", {
+      headline: headline,
+      category: category,
+      watch_time: watchTime,
+    });
+  } catch (err) {
+    console.error("Error tracking watch time:", err);
+  }
+};
+
 
   const trackRedditClick = async (article) => {
     try {
