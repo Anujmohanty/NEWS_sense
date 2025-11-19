@@ -61,7 +61,7 @@ export default function NewsList() {
   const trackWatchTime = async (headline, watchTime) => {
     try {
       await axios.post("http://127.0.0.1:8000/analytics/watch-time", {
-        headline,
+        headline:article.headline,
         category: selectedArticle.category,
         watch_time: watchTime,
       });
@@ -73,7 +73,7 @@ export default function NewsList() {
   const trackRedditClick = async (article) => {
     try {
       await axios.post("http://127.0.0.1:8000/analytics/reddit-click", {
-        headline,
+        headline:article.headline,
         category: article.category, 
       });
     } catch (err) {
