@@ -28,10 +28,12 @@ class SummaryRequest(BaseModel):
 
 class AnalyticsRequest(BaseModel):
     headline: str
+    category: str | None = None  
 
 class WatchTimeRequest(BaseModel):
     headline: str
     watch_time: int
+    category: str | None = None  
 
 @app.get("/news")
 async def read_news():
