@@ -5,7 +5,6 @@ from redditSearch import get_reddit_links
 from categorize_news import categorize_headline
 from db import save_news_item, track_read_more_click, track_reddit_click, track_watch_time
 from gemini_summary import generate_summary
-from local_storage import save_interaction_locally
 from local_storage import store_user_interaction
 from fastapi import HTTPException
 from datetime import datetime
@@ -92,10 +91,10 @@ async def track_read_more(request: AnalyticsRequest):
         track_read_more_click(request.headline)
 
         # 2️⃣ Save to local JSON (new behavior)
-        save_interaction_locally(
+        store_user_interaction(
             headline=request.headline,
             category=request.category if hasattr(request, "category") else None,
-            read_more_increment=1
+            read_more_clicks=1
         )
 
         return {"status": "success", "message": "Read more click tracked"}
@@ -110,10 +109,10 @@ async def track_reddit(request: AnalyticsRequest):
         track_reddit_click(request.headline)
 
         # 2️⃣ New behavior — save locally
-        save_interaction_locally(
+        store_user_interaction(
             headline=request.headline,
             category=request.category if hasattr(request, "category") else None,
-            reddit_increment=1
+            reddit_clicks=1
         )
 
         return {"status": "success", "message": "Reddit click tracked"}
@@ -128,11 +127,11 @@ async def track_watch_time_endpoint(request: WatchTimeRequest):
         track_watch_time(request.headline, request.watch_time)
 
         # 2️⃣ New behavior — save locally
-        save_interaction_locally(
+        store_user_interaction(
             headline=request.headline,
             category=request.category if hasattr(request, "category") else None,
-            watch_time_increment=request.watch_time,
-            sessions_increment=1
+            total_watch_time=request.watch_time,
+            watch_sessions=1
         )
 
         return {"status": "success", "message": "Watch time tracked"}
@@ -158,5 +157,13 @@ async def save_category_endpoint(request: AnalyticsRequest):
         return {"status": "success", "message": "Category stored locally"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error storing category locally: {e}")
+
+
+
+
+
+
+
+ 
 
 
